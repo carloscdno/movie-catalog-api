@@ -1,14 +1,15 @@
 from fastapi import FastAPI
+from config import settings
 
 # Creamos la instancia de la aplicación FastAPI
 app = FastAPI(
-    title="Movie Catalog API",
-    version="0.1.0",
-    description="API básica para gestionar un catálogo de películas."
+    title = settings.app_name,
+    version= settings.app_version,
+    debug = settings.debug,
 )
 
 # Definimos el endpoint raíz
 @app.get("/")
-def read_root():
+async def root():
     """Endpoint principal de la API."""
     return {"message": "Bienvenido al Catálogo de Películas 🎬"}
