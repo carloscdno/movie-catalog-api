@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from config import settings
+from models import MovieCreate   
 
 # Creamos la instancia de la aplicación FastAPI
 app = FastAPI(
@@ -13,3 +14,13 @@ app = FastAPI(
 async def root():
     """Endpoint principal de la API."""
     return {"message": "Bienvenido al Catálogo de Películas 🎬"}
+
+# POST endpoint para crear una nueva película
+@app.post("/movies/")
+async def create_movie(payload: MovieCreate):
+    """Crea una nueva película en el catálogo."""
+    return {
+        "success": True,
+        "message": "Película recibida (aun sin guardar)",
+        "data": payload.model_dump()
+        }
