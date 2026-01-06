@@ -1,4 +1,14 @@
+"""
+Persistencia con JSON (fase 1):
+- Prepara y resuelve la ruta del archivo de datos (movies.json).
+- Crea el archivo si no existe.
+- Implementa carga (load_data) y guardado (save_data) del catálogo.
+- Mantiene la estructura en memoria como dicts simples (aún no Pydantic Models).
+
+"""
 from pathlib import Path
+import json
+from typing import List, Dict, Optional
 
 # Nombre por defecto del archivo donde guardaremos las películas
 DEFAULT_DB_FILE = "movies.json"
@@ -27,7 +37,8 @@ def ensure_db_file_exists() -> Path:
         path.parent.mkdir(parents=True, exist_ok=True)
         # Creamos el archivo vacío
         path.touch(exist_ok=True)
-
+        # Inicializamos con una estructura minima valida
+        path.write_text(json.dumps({"movies": [], "next_id": 1}, ensure_ascii=False, indent=2), encoding="utf-8")
     return path
 
 class MovieDatabase:
@@ -36,20 +47,106 @@ class MovieDatabase:
     Por ahora, solo mantiene los datos temporalmente mientras la app está activa.
     """
     
-    def __init__(self):
+    def __init__(self, file_path: Optional[str] = None):
         # Diccionario interno para almacenar las películas
-        self.movies: dict[int, dict] = {}
+        self.movies: Dict[int, dict] = {}
         self.next_id: int = 1  # ID incremental para nuevas películas
+        
+        # Ruta del archivo; si no te pasan una, usamos la por defecto
+        self.file_path = Path(file_path) if file_path else get_db_path()
+        ensure_db_file_exists() # Garantiza que el archivo exista con estructura básica
+        self.load_data()        # Hidrata la memoria con lo que haya en disco
+        
+    # ---------------------------------------------------------------------
+    # Persistencia
+    # ---------------------------------------------------------------------
+    
+    def load_data(self) -> None:
+        """
+        Lee el archivo JSON y carga las películas en memoria.
+        Espera un JSON con llaves: "movies" (lista) y "next_id" (int).
+        Si el archivo está vacío o corrupto, re-inicializa estructura.
+        """
+        try:
+            text = self.file_path.read_text(encoding="utf-8").strip()
+            if not text:
+                # Si está vacío, inicializamos estructura básica
+                self.movies = {}
+                self.next_id = 1
+                self.save_data()
+                return
+            
+            data = json.loads(text)
+            
+            # Validación mínima de estructura
+            movies_list: List[Dict] = data.get("movies", [])
+            next_id_val: int = data.get("next_id", 1)
+            
+            # Cargar en memoria como dict {id: dict_movie}
+            self.movies = {}
+            for item in movies_list:
+                # Validación básica de que tenga id
+                movie_id = item.get("id")
+                if isinstance(movie_id, int):
+                    self.movies[movie_id] = item
+            
+            # Si no viene next_id, lo calculamos como max_id + 1
+            if isinstance(next_id_val, int) and next_id_val > 0:
+                self.next_id = next_id_val
+            else:
+                self.next_id = (max(self.movies.keys()) + 1) if self.movies else 1
+            
+        except Exception as e:
+            # Si algo falla (JSON malformado, etc.), re-inicializamos seguro
+            print(f"[MovieDatabase.load_data] Error al cargar datos: {e}")
+            self.movies = {}
+            self.next_id = 1
+            self.save_data()
+    
+    def save_data(self) -> None:
+        """
+        Vuelca el estado actual a disco en formato JSON.
+        Estructura:
+        {
+          "movies": [ {...}, {...} ],
+          "next_id": <int>
+        }
+        """
+
+        try:
+            data = {
+                "movies": list(self.movies.values()),
+                "next_id": self.next_id
+            }
+
+            self.file_path.write_text(
+                json.dumps(data, ensure_ascii=False, indent=2),
+                encoding="utf-8"
+            )
+
+        except Exception as e:
+            print(f"[MovieDatabase.save_data] Error al guardar datos: {e}")
+
+            # Re-lanzar en escenarios reales si se quiere manejar afuera
+            # raise
+
+    # ---------------------------------------------------------------------
+    # Operaciones en memoria (con persistencia mínima en add)
+    # ---------------------------------------------------------------------
         
     def add_movie(self, movie_data: dict) -> dict:
         """
         Agrega una nueva película al catálogo.
-        Aún no guarda en JSON (solo memoria).
+        Persistencia: guarda inmediatamente tras agregar.
         """
         movie_id = self.next_id
-        self.movies[movie_id] = {"id": movie_id, **movie_data}
+        record = {"id": movie_id, **movie_data}
+        self.movies[movie_id] = record
         self.next_id += 1
-        return self.movies[movie_id]
+        
+        # Guardamos tras cada cambio
+        self.save_data()
+        return record
     
     def list_movies(self) -> list[dict]:
         """Devuelve la lista de todas las películas en memoria."""

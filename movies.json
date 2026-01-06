@@ -1,0 +1,21 @@
+{
+  "movies": [
+    {
+      "id": 1,
+      "title": "Inception",
+      "director": "Christopher Nolan",
+      "year": 2010,
+      "genre": "Sci-Fi",
+      "rating": 9.0
+    },
+    {
+      "id": 2,
+      "title": "Inception",
+      "director": "Christopher Nolan",
+      "year": 2010,
+      "genre": "Sci-Fi",
+      "rating": 9.0
+    }
+  ],
+  "next_id": 3
+}
