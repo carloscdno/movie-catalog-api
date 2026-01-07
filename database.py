@@ -25,12 +25,14 @@ def get_db_path() -> Path:
     """
     return DB_PATH
 
-def ensure_db_file_exists() -> Path:
+def ensure_db_file_exists(path: Optional[Path] = None) -> Path:
     """
     Crea el archivo movies.json si no existe.
-    No escribe datos todavía, solo garantiza que el archivo esté presente.
+    Si no se pasa path, usa la ruta por defecto.
     """
-    path = get_db_path()
+    if path is None:
+        path = get_db_path()
+    
 
     if not path.exists():
         # Aseguramos que exista la carpeta donde estará el archivo
@@ -54,7 +56,7 @@ class MovieDatabase:
         
         # Ruta del archivo; si no te pasan una, usamos la por defecto
         self.file_path = Path(file_path) if file_path else get_db_path()
-        ensure_db_file_exists() # Garantiza que el archivo exista con estructura básica
+        ensure_db_file_exists(self.file_path) # Garantiza que el archivo exista con estructura básica o le pasamos la ruta
         self.load_data()        # Hidrata la memoria con lo que haya en disco
         
     # ---------------------------------------------------------------------

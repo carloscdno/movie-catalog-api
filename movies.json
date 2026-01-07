@@ -15,7 +15,23 @@
       "year": 2010,
       "genre": "Sci-Fi",
       "rating": 9.0
+    },
+    {
+      "id": 3,
+      "title": "Inception",
+      "director": "Christopher Nolan",
+      "year": 2010,
+      "genre": "Sci-Fi",
+      "rating": 9.0
+    },
+    {
+      "id": 4,
+      "title": "Inception",
+      "director": "Christopher Nolan",
+      "year": 2010,
+      "genre": "Sci-Fi",
+      "rating": 9.0
     }
   ],
-  "next_id": 3
+  "next_id": 5
 }
