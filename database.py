@@ -120,12 +120,11 @@ class MovieDatabase:
                 "movies": list(self.movies.values()),
                 "next_id": self.next_id
             }
-
             self.file_path.write_text(
                 json.dumps(data, ensure_ascii=False, indent=2),
                 encoding="utf-8"
             )
-
+            
         except Exception as e:
             print(f"[MovieDatabase.save_data] Error al guardar datos: {e}")
 
