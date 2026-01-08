@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from database import MovieDatabase
+from models import MovieCreate # Nueva importación
 
 # Creamos un router modular para las rutas de peliculas
 router = APIRouter(tags=["movies"])
@@ -9,31 +10,43 @@ db = MovieDatabase()
 
 # Endpoint para crear una nueva película
 @router.post("/movies/", status_code=201)
-def create_movie(payload: dict):
+def create_movie(movie: MovieCreate):
     """ Crea una nueva película en el catálogo.
     - Valida campos mínimos requeridos.
     - Asigna un ID incremental automáticamente.
     - Guarda en memoria y persiste en el archivo JSON.
     """
-    # Validación mínima (sin usar Pydantic aún)
-    required = ["title", "director", "year", "genre"]
+    # ---------------------------------------------------------------------
+    # Validacion Manual (antes de usar Pydantic)
+    # ---------------------------------------------------------------------
+    #required = ["title", "director", "year", "genre"]
     
-    missing_fields = [field for field in required if field not in payload]
-    if missing_fields:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Faltan campos requeridos: {', '.join(missing_fields)}"
-        )
+    #missing_fields = [field for field in required if field not in payload]
+    #if missing_fields:
+    #    raise HTTPException(
+    #        status_code=400,
+    #        detail=f"Faltan campos requeridos: {', '.join(missing_fields)}"
+    #    )
     # Crear la película en memoria
-    db.add_movie(payload)
+    #db.add_movie(payload)
     
     # Guardar en disco
-    db.save_data()
+    #db.save_data()
+    
+    # ---------------------------------------------------------------------
+    # Usando Pydantic para validacion automática
+    # ---------------------------------------------------------------------
+    # Convertimos el modelo validado a dict
+    data = movie.model_dump()
+    
+    # Guardado en memoria y persistencia
+    created = db.add_movie(data)
+   
     
     return {
         "success": True,
         "message": "Película creada correctamente",
-        "data": payload
+        "data": created
     }
 
 # Endpoint para listar todas las películas

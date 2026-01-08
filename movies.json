@@ -31,7 +31,51 @@
       "year": 2013,
       "genre": "Sci-Fi",
       "rating": 9.0
+    },
+    {
+      "id": 6,
+      "title": "Whiplash",
+      "director": "Damien Chazelle",
+      "year": 2014,
+      "genre": "Drama",
+      "rating": 9.0
+    },
+    {
+      "id": 7,
+      "title": "Sentimental Value",
+      "director": "Joachim Trier",
+      "year": 2025,
+      "genre": "Drama",
+      "duration": null,
+      "rating": 9.0,
+      "description": null,
+      "price": null,
+      "is_watched": false
+    },
+    {
+      "id": 8,
+      "title": "The Matrix",
+      "director": "Wachowskis",
+      "year": 1999,
+      "genre": "Sci-Fi",
+      "duration": null,
+      "rating": 8.0,
+      "description": null,
+      "price": null,
+      "is_watched": false
+    },
+    {
+      "id": 9,
+      "title": "Eternal Sunshine of the Spotless Mind",
+      "director": "Michel Gondry",
+      "year": 2004,
+      "genre": "Sci-Fi",
+      "duration": null,
+      "rating": 10.0,
+      "description": null,
+      "price": null,
+      "is_watched": false
     }
   ],
-  "next_id": 6
+  "next_id": 10
 }
