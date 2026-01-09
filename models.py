@@ -67,3 +67,10 @@ class MovieUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=1000)
     price: Optional[float] = Field(None, ge=0.0)
     is_watched: Optional[bool] = None
+
+class MovieResponse(MovieBase):
+    """Modelo para la respuesta de una película, incluye el ID."""
+    success: bool = Field(..., description="Indica si la operación fue exitosa")
+    message: str = Field(..., description="Mensaje breve para el cliente")
+    data: Optional[dict] = Field(None, description="Película devuelta [dict] o None si no aplica") 
+    
