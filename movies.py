@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from database import MovieDatabase
-from models import MovieCreate, MovieUpdate
+from models import MovieCreate, MovieUpdate, MovieResponse
 
 # Creamos un router modular para las rutas de peliculas
 router = APIRouter(tags=["movies"])
@@ -9,7 +9,7 @@ router = APIRouter(tags=["movies"])
 db = MovieDatabase()
 
 # Endpoint para crear una nueva película
-@router.post("/movies/", status_code=201)
+@router.post("/movies/", status_code=201, response_model=MovieResponse)
 def create_movie(movie: MovieCreate):
     """ Crea una nueva película en el catálogo.
     - Valida campos mínimos requeridos.
@@ -42,7 +42,6 @@ def create_movie(movie: MovieCreate):
     # Guardado en memoria y persistencia
     created = db.add_movie(data)
    
-    
     return {
         "success": True,
         "message": "Película creada correctamente",
@@ -58,7 +57,7 @@ def list_movies():
     return db.list_movies()
 
 # Endpoint para obtener una película por su ID
-@router.get("/movies/{movie_id}")
+@router.get("/movies/{movie_id}", response_model=MovieResponse)
 def get_movie(movie_id: int):
     """Devuelve una película por su ID.
     - Si existe, retorna el objeto (dict) con sus campos.
@@ -67,10 +66,14 @@ def get_movie(movie_id: int):
     movie = db.get_movie(movie_id)
     if movie is None:
         raise HTTPException(status_code=404, detail=f"Película con ID {movie_id} no encontrada")
-    return movie
+    return {
+        "success": True,
+        "message": "Película encontrada correctamente",
+        "data": movie
+    }
 
 # Endpoint para actualizar pelicula existente
-@router.put("/movies/{movie_id}")
+@router.put("/movies/{movie_id}", response_model=MovieResponse)
 def update_movie(movie_id: int, changes: MovieUpdate):
     """
     Actualiza los datos de una película existente.
@@ -103,7 +106,7 @@ def update_movie(movie_id: int, changes: MovieUpdate):
     }
 
 # Endpoint para eliminar una película por su ID
-@router.delete("/movies/{movie_id}")
+@router.delete("/movies/{movie_id}", response_model=MovieResponse)
 def delete_movie(movie_id: int):
     """
     Elimina una película por ID.
@@ -120,5 +123,6 @@ def delete_movie(movie_id: int):
     
     return {
         "success": True,
-        "message": f"Película con ID {movie_id} eliminada correctamente"
+        "message": f"Película con ID {movie_id} eliminada correctamente",
+        "data": None
     }
