@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from database import MovieDatabase
-from models import MovieCreate # Nueva importación
+from models import MovieCreate, MovieUpdate
 
 # Creamos un router modular para las rutas de peliculas
 router = APIRouter(tags=["movies"])
@@ -71,20 +71,29 @@ def get_movie(movie_id: int):
 
 # Endpoint para actualizar pelicula existente
 @router.put("/movies/{movie_id}")
-def update_movie(movie_id: int, payload: dict):
+def update_movie(movie_id: int, changes: MovieUpdate):
     """
     Actualiza los datos de una película existente.
     - Busca el ID.
     - Aplica solo los campos enviados.
     - Guarda los cambios en el JSON.
     """
+    # 1) Buscamos la pelicula
     movie = db.get_movie(movie_id)
     if movie is None:
-        raise HTTPException(status_code=404, detail=f"Película con ID {movie_id} no encontrada")
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Película con ID {movie_id} no encontrada"
+            )
     
-    # Actualizamos solo los campos presentes en el payload
-    movie.update(payload)
+    # 2) Tomar únicamente los campos provistos en el body
+    update_data = changes.model_dump(exclude_unset=True)
+    
+    # 3) Aplicar los cambios en memoria
+    movie.update(update_data)
     db.movies[movie_id] = movie
+    
+    # 4) Guardar los cambios en el archivo JSON
     db.save_data()
     
     return {
