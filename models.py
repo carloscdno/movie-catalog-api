@@ -54,3 +54,16 @@ class MovieBase(BaseModel):
 class MovieCreate(MovieBase):
     """Modelo para crear una nueva película."""
     pass
+
+# Todos los valores son opcionales para actualizaciones parciales
+class MovieUpdate(BaseModel):
+    """Modelo usado para actualizar parcialmente una película existente."""
+    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    director: Optional[str] = Field(None, min_length=1, max_length=100)
+    year: Optional[int] = Field(None, ge=1880, le=2030)
+    genre: Optional[str] = Field(None, min_length=1, max_length=50)
+    duration: Optional[int] = Field(None, ge=1, le=600)
+    rating: Optional[float] = Field(None, ge=0.0, le=10.0)
+    description: Optional[str] = Field(None, max_length=1000)
+    price: Optional[float] = Field(None, ge=0.0)
+    is_watched: Optional[bool] = None
