@@ -73,4 +73,11 @@ class MovieResponse(MovieBase):
     success: bool = Field(..., description="Indica si la operación fue exitosa")
     message: str = Field(..., description="Mensaje breve para el cliente")
     data: Optional[dict] = Field(None, description="Película devuelta [dict] o None si no aplica") 
+
+class MovieListResponse(BaseModel):
+    """Modelo para la respuesta al listar películas."""
+    success: bool = Field(..., description="Indica si la operación fue exitosa")
+    message: str = Field(..., description="Mensaje breve para el cliente")
+    data: List[dict] = Field(..., default_factory=list, description="Listado de peliculas en este paso")
+    total: int = Field(..., description="Número total de películas en el catálogo")
     
